@@ -1,5 +1,5 @@
 {
-  "name": "opencode-browser-control",
+  "name": "opencode-browser-preview",
   "version": "1.0.0",
   "description": "OpenCode plugin: control and monitor a real Edge/Chrome over CDP, and preview local web tools in the Review pane.",
   "type": "module",
@@ -21,6 +21,14 @@
     "preview"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<your-username>/opencode-browser-preview.git"
+  },
+  "bugs": {
+    "url": "https://github.com/<your-username>/opencode-browser-preview/issues"
+  },
+  "homepage": "https://github.com/<your-username>/opencode-browser-preview#readme",
   "engines": {
     "node": ">=18"
   }
