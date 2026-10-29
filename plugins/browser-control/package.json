@@ -23,12 +23,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/<your-username>/opencode-browser-preview.git"
+    "url": "https://github.com/uonl/opencode-browser-preview.git"
   },
   "bugs": {
-    "url": "https://github.com/<your-username>/opencode-browser-preview/issues"
+    "url": "https://github.com/uonl/opencode-browser-preview/issues"
   },
-  "homepage": "https://github.com/<your-username>/opencode-browser-preview#readme",
+  "homepage": "https://github.com/uonl/opencode-browser-preview#readme",
   "engines": {
     "node": ">=18"
   }
