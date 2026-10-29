@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview</title>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#171310;overflow:hidden}
+  iframe{display:block;width:100%;height:100vh;border:0;background:#171310}
+  .fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+    color:#e8dcc4;font:14px/1.7 "Microsoft YaHei",Consolas,monospace;text-align:center;padding:24px}
+  .fallback code{background:#2f271f;border:1px solid #4a3b2b;border-radius:4px;padding:2px 6px}
+  .hide{display:none}
+</style>
+</head>
+<body>
+  <!-- 把 __PORT__ 换成实际端口；__HEALTH__ 换成健康接口路径 -->
+  <iframe id="app" src="http://127.0.0.1:__PORT__/" title="Preview"></iframe>
+  <div id="fallback" class="fallback hide">
+    <div>
+      <div style="font-size:16px;margin-bottom:10px">本地服务未启动</div>
+      <div>请先启动服务，或在项目根运行启动脚本。</div>
+      <div style="margin-top:14px;color:#8a7a60">启动后刷新本页即可。</div>
+    </div>
+  </div>
+<script>
+  (function () {
+    let alive = false;
+    fetch('http://127.0.0.1:__PORT____HEALTH__', { cache: 'no-store' })
+      .then(r => r.json())
+      .then(j => { alive = !!(j && (j.ok || j.status === 'ok')); })
+      .catch(() => { alive = false; })
+      .finally(() => {
+        if (!alive) document.getElementById('fallback').classList.remove('hide');
+      });
+    setTimeout(() => {
+      if (!alive) document.getElementById('fallback').classList.remove('hide');
+    }, 5000);
+  })();
+</script>
+</body>
+</html>
