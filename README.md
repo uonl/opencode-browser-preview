@@ -1,54 +1,57 @@
-# OpenCode Extensions · 本地 Web 预览 + 浏览器控制
+# OpenCode Extensions
 
-两个可复用的 OpenCode 扩展：
+> Local web preview + real browser control for **OpenCode V2**.
 
-1. **`skills/local-web-preview`** — 技能：在 OpenCode 右侧 Review 窗格预览本地 Web 应用，修复「加载文件失败」「Failed to fetch」，配置 CORS 与开机自启。
-2. **`plugins/browser-control`** — 插件：通过 CDP 操控真实 Edge/Chrome，并采集网络/控制台/异常；同时提供右侧预览页生成与 GUI 内嵌面板。
+Two reusable extensions for [OpenCode](https://opencode.ai):
 
-## 目录
+| Part | What it does |
+|---|---|
+| **`skills/local-web-preview`** | A skill that teaches the agent to preview a local web app in OpenCode's right-hand Review pane, fix `加载文件失败` / `Failed to fetch`, add CORS, and auto-start the service after reboot. |
+| **`plugins/browser-control`** | A plugin that drives a real Edge/Chrome over the Chrome DevTools Protocol (CDP), captures network/console/exceptions, generates a right-pane preview page, and optionally embeds a GUI panel. |
 
+## Features
+
+- **Right-pane preview** — full-screen `iframe` page + `browser.md` entry, so a local tool appears inside OpenCode.
+- **Real browser control** — list/open/navigate/click/type/key/eval/screenshot over CDP.
+- **Monitoring** — capture `Network.*`, `Runtime.consoleAPICalled`, `Runtime.exceptionThrown`, and `Log.entryAdded` as JSON.
+- **CORS guidance** — fixes the sandboxed-iframe `OPTIONS` preflight problem.
+- **Auto-start** — optional scheduled task + startup shortcut + watchdog for Windows.
+
+## Requirements
+
+- OpenCode **V2**
+- **Windows** (PowerShell 5.1+, Edge or Chrome)
+- Node.js **18+** (for `cdp-monitor.mjs`)
+
+> The CDP client `tools/cdp.ps1` is Windows-only. The skill's HTML preview part is cross-platform.
+
+## Install
+
+### 1. Skill
+
+Copy `skills/local-web-preview` into your global skills directory:
+
+```powershell
+# Windows
+Copy-Item skills\local-web-preview "$env:USERPROFILE\.config\opencode\skills\local-web-preview" -Recurse -Force
 ```
-opencode-extensions/
-├── skills/
-│   └── local-web-preview/
-│       ├── SKILL.md
-│       ├── templates/
-│       │   ├── preview.html
-│       │   ├── start.cmd
-│       │   ├── install-autostart.ps1
-│       │   └── cors-snippet.md
-│       └── references/troubleshooting.md
-├── plugins/
-│   └── browser-control/
-│       ├── index.js              # server 工具
-│       ├── cdp-monitor.mjs       # 网络/控制台采集
-│       ├── gui-experimental.cjs  # 右侧内嵌面板
-│       └── package.json
-└── tools/
-    └── cdp.ps1                   # CDP 客户端（插件依赖）
-```
-
-## 安装
-
-### 技能
-
-复制到全局技能目录：
 
 ```bash
-# Windows (XDG_CONFIG_HOME 可能不同)
-copy skills\local-web-preview "%USERPROFILE%\.config\opencode\skills\local-web-preview" /E
+# macOS / Linux (if you use the HTML preview part only)
+cp -R skills/local-web-preview ~/.config/opencode/skills/
 ```
 
-或在项目的 `opencode.json` 里加：
+Or reference the folder from `opencode.json`:
 
 ```jsonc
-{ "skills": ["./opencode-extensions/skills"] }
+{
+  "skills": ["./opencode-extensions/skills"]
+}
 ```
 
-### 插件
+### 2. Plugin
 
-1. 把 `plugins/browser-control` 和 `tools/cdp.ps1` 放到同一项目根下（保持 `tools/cdp.ps1` 相对位置）。
-2. 在 `opencode.json` 注册插件：
+Keep `plugins/browser-control` and `tools/cdp.ps1` in the same project root, then register the plugin:
 
 ```jsonc
 {
@@ -56,13 +59,13 @@ copy skills\local-web-preview "%USERPROFILE%\.config\opencode\skills\local-web-p
 }
 ```
 
-3. 重启 OpenCode 桌面应用（GUI 面板需要重新加载）。
+Restart OpenCode Desktop so the GUI part loads.
 
-## 使用
+## Usage
 
-### 真实浏览器（CDP）
+### Real browser (CDP)
 
-先启动带调试端口的 Edge：
+Start Edge with a debugging port:
 
 ```powershell
 & 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe' `
@@ -71,44 +74,58 @@ copy skills\local-web-preview "%USERPROFILE%\.config\opencode\skills\local-web-p
   http://127.0.0.1:8770/
 ```
 
-工具：
+Then use the tools:
 
-| 工具 | 作用 |
+| Tool | Description |
 |---|---|
-| `cdp_list` | 列出页面标签 |
-| `cdp_open` / `cdp_nav` | 新开 / 导航 |
-| `cdp_eval` | 执行 JS |
-| `cdp_click` / `cdp_type` / `cdp_key` | 交互 |
-| `cdp_shot` | 截图 |
-| `cdp_wait_for` | 轮询表达式 |
-| `cdp_monitor` | 采集网络/console/异常/日志 |
+| `cdp_list` | List page targets |
+| `cdp_open` | Open a new tab |
+| `cdp_nav` | Navigate |
+| `cdp_eval` | Evaluate JavaScript |
+| `cdp_click` | Click at coordinates |
+| `cdp_type` | Type into the focused field |
+| `cdp_key` | Press Enter / Tab / Escape |
+| `cdp_shot` | Capture a PNG screenshot |
+| `cdp_wait_for` | Poll an expression until truthy |
+| `cdp_monitor` | Capture network / console / exceptions / logs |
 
-### 右侧预览
+### Right-pane preview
 
 ```
 cdp_preview { "port": 8770 }
 ```
 
-生成 `<项目根>/drama_preview.html` 和 `browser.md`，在 OpenCode 右侧打开即可。
+Creates `<project>/drama_preview.html` and `browser.md`. Open the HTML file in OpenCode's Review pane.
 
-### GUI 内嵌面板
+### GUI panel
 
-重启桌面应用后，命令面板执行「打开剧情编辑器」，或在右侧 `+` 菜单选择。
+After restarting Desktop, run **“打开剧情编辑器”** from the command palette, or pick **剧情编辑器** in the right-side `+` menu.
 
-> 插件 id 为 `browser-control`，面板 key 为 `browser-control:web`。
+## How it works
 
-## 安全
+1. OpenCode's Review pane renders `.html` files in a sandboxed iframe.
+2. Markdown renderers strip `<iframe>` (DOMPurify), so the preview entry must be an `.html` file.
+3. A sandboxed iframe has an opaque origin, so `POST` + JSON triggers an `OPTIONS` preflight. The local server must return CORS headers and `204` for `OPTIONS`.
+4. `tools/cdp.ps1` speaks CDP over `ClientWebSocket`; `cdp-monitor.mjs` uses Node's global `WebSocket`.
 
-- 本仓库**不包含任何 API Key**。
-- `ai_config.json` 等本地配置文件不要提交。
-- `.gitignore` 已排除 `node_modules/`、`temp/`、`backups/`、`*.log`。
+See [`skills/local-web-preview/references/troubleshooting.md`](skills/local-web-preview/references/troubleshooting.md) for detailed fixes.
 
-## 兼容性
+## Troubleshooting
 
-- OpenCode V2（`@opencode/plugin`）
-- Windows（PowerShell 5.1+、Edge/Chrome）
-- 插件依赖 `tools/cdp.ps1`，请保持相对路径不变
+| Symptom | Fix |
+|---|---|
+| Right pane says `加载文件失败` | Create `browser.md` in the project root |
+| Buttons say `Failed to fetch` | Add CORS headers + `OPTIONS 204` to the server |
+| Preview is blank | Start the local service; the page shows a hint |
+| `cdp_list` cannot connect | Start Edge with `--remote-debugging-port=9222` |
+| Stop script keeps restarting | Kill the watchdog `cmd` process too |
 
-## 许可
+## Security
 
-MIT
+- This repository contains **no API keys**.
+- Keep local config such as `ai_config.json` out of version control.
+- `.gitignore` already excludes `node_modules/`, `temp/`, `backups/`, and `*.log`.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

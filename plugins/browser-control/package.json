@@ -1,9 +1,27 @@
 {
   "name": "opencode-browser-control",
   "version": "1.0.0",
+  "description": "OpenCode plugin: control and monitor a real Edge/Chrome over CDP, and preview local web tools in the Review pane.",
   "type": "module",
   "exports": {
     ".": "./index.js",
     "./gui-experimental": "./gui-experimental.cjs"
+  },
+  "files": [
+    "index.js",
+    "cdp-monitor.mjs",
+    "gui-experimental.cjs"
+  ],
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "cdp",
+    "chrome-devtools-protocol",
+    "browser-automation",
+    "preview"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
   }
 }
