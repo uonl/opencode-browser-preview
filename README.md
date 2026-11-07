@@ -117,6 +117,8 @@ story_arc     { "role": "塞拉斯" }
 
 `story_chapter` writes the generated chapter under `世界书/05_剧情与魔将/生成/<id>.md`.
 
+> `story-gen` is tuned for 《文字》 and reads `世界书/05_剧情与魔将/整体剧情设计_小说式.md` when present; without it, generation still works from the built-in chapter list.
+
 ## How it works
 
 1. OpenCode's Review pane renders `.html` files in a sandboxed iframe.
