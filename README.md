@@ -2,13 +2,12 @@
 
 > Local web preview + real browser control for **OpenCode V2**.
 
-Three reusable extensions for [OpenCode](https://opencode.ai):
+Two reusable extensions for [OpenCode](https://opencode.ai):
 
 | Part | What it does |
 |---|---|
 | **`skills/local-web-preview`** | A skill that teaches the agent to preview a local web app in OpenCode's right-hand Review pane, fix `加载文件失败` / `Failed to fetch`, add CORS, and auto-start the service after reboot. |
 | **`plugins/browser-control`** | A plugin that drives a real Edge/Chrome over the Chrome DevTools Protocol (CDP), captures network/console/exceptions, generates a right-pane preview page, and optionally embeds a GUI panel. |
-| **`plugins/story-gen`** | A plugin that generates novel-style chapters, dialogue and character arcs for 《文字》 from the story bible. |
 
 ## Features
 
@@ -17,7 +16,6 @@ Three reusable extensions for [OpenCode](https://opencode.ai):
 - **Monitoring** — capture `Network.*`, `Runtime.consoleAPICalled`, `Runtime.exceptionThrown`, and `Log.entryAdded` as JSON.
 - **CORS guidance** — fixes the sandboxed-iframe `OPTIONS` preflight problem.
 - **Auto-start** — optional scheduled task + startup shortcut + watchdog for Windows.
-- **Story generation** — generate chapters, dialogue and character arcs for 《文字》 from the story bible.
 
 ## Requirements
 
@@ -51,16 +49,13 @@ Or reference the folder from `opencode.json`:
 }
 ```
 
-### 2. Plugins
+### 2. Plugin
 
-Keep `plugins/browser-control` and `tools/cdp.ps1` in the same project root, then register both plugins:
+Keep `plugins/browser-control` and `tools/cdp.ps1` in the same project root, then register the plugin:
 
 ```jsonc
 {
-  "plugins": [
-    "D:\\path\\to\\opencode-extensions\\plugins\\browser-control",
-    "D:\\path\\to\\opencode-extensions\\plugins\\story-gen"
-  ]
+  "plugins": ["D:\\path\\to\\opencode-extensions\\plugins\\browser-control"]
 }
 ```
 
@@ -105,19 +100,6 @@ Creates `<project>/drama_preview.html` and `browser.md`. Open the HTML file in O
 ### GUI panel
 
 After restarting Desktop, run **“打开剧情编辑器”** from the command palette, or pick **剧情编辑器** in the right-side `+` menu.
-
-### Story generator
-
-```text
-story_list
-story_chapter { "id": "1-1" }
-story_dialog  { "role": "温若" }
-story_arc     { "role": "塞拉斯" }
-```
-
-`story_chapter` writes the generated chapter under `世界书/05_剧情与魔将/生成/<id>.md`.
-
-> `story-gen` is tuned for 《文字》 and reads `世界书/05_剧情与魔将/整体剧情设计_小说式.md` when present; without it, generation still works from the built-in chapter list.
 
 ## How it works
 
